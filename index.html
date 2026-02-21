@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>المحاسبة اليومية</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>🌙 المحاسبة اليومية للعبادات</h1>
+      <p class="subtitle">اللهم أعنا على ذكرك وشكرك وحسن عبادتك</p>
+
+      <!-- عرض وتعديل التاريخ -->
+      <div id="dateDisplay"
+        style="margin-top:10px; display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;">
+        <span id="arabicDateText" style="font-size:1.1rem; color:#4a5568; font-weight:600;"></span>
+        <button onclick="toggleDateEdit()" title="تعديل التاريخ"
+          style="background:none; border:none; cursor:pointer; font-size:1.2rem;">✏️</button>
+      </div>
+      <div id="dateEditArea" style="display:none; margin-top:8px; justify-content:center; align-items:center; gap:8px;">
+        <input type="date" id="dateInput"
+          style="padding:6px 12px; border:2px solid #68d391; border-radius:8px; font-size:1rem; direction:ltr; outline:none;" />
+        <button onclick="confirmDate()" title="تأكيد التاريخ"
+          style="background:#48bb78; color:white; border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center;">✓</button>
+      </div>
+    </header>
+
+    <!-- صفحة النموذج اليومي فقط -->
+    <div id="formPage" class="page active">
+      <div class="form-container">
+        <div class="user-selector">
+          <label for="userName">اختر اسمك:</label>
+          <select id="userName" onchange="updateUserForm()">
+            <option value="">-- اختر المستخدم --</option>
+          </select>
+        </div>
+
+        <div id="personalLink" class="personal-link" style="display: none;">
+          <p>🔗 رابطك الشخصي:</p>
+          <input type="text" id="linkDisplay" readonly>
+          <button onclick="copyLink()">📋 نسخ الرابط</button>
+        </div>
+
+        <form id="dailyForm" onsubmit="submitForm(event)">
+          <div id="dynamicActivities" class="dynamic-activities-container">
+            <!-- سيتم توليد البنود هنا ديناميكياً بواسطة JavaScript -->
+          </div>
+
+          <div class="submit-section">
+            <button type="submit" class="submit-btn">✅ إرسال المحاسبة</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Supabase SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+  <script>
+    // ---- إدارة التاريخ ----
+    var currentDate = new Date();
+
+    function toInputValue(date) {
+      var y = date.getFullYear();
+      var m = String(date.getMonth() + 1).padStart(2, '0');
+      var d = String(date.getDate()).padStart(2, '0');
+      return y + '-' + m + '-' + d;
+    }
+
+    function formatArabicDate(date) {
+      return date.toLocaleDateString('ar-SA', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+
+    function toggleDateEdit() {
+      var editArea = document.getElementById('dateEditArea');
+      var input = document.getElementById('dateInput');
+      if (editArea.style.display === 'none') {
+        input.value = toInputValue(currentDate);
+        editArea.style.display = 'flex';
+      } else {
+        editArea.style.display = 'none';
+      }
+    }
+
+    function confirmDate() {
+      var input = document.getElementById('dateInput');
+      if (input.value) {
+        currentDate = new Date(input.value + 'T00:00:00');
+        document.getElementById('arabicDateText').textContent = formatArabicDate(currentDate);
+      }
+      document.getElementById('dateEditArea').style.display = 'none';
+    }
+
+    // تهيئة التاريخ عند فتح الصفحة
+    document.getElementById('arabicDateText').textContent = formatArabicDate(currentDate);
+    document.getElementById('dateInput').value = toInputValue(currentDate);
+  </script>
+</body>
+
+</html>

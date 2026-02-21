@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول - نظام المحاسبة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            direction: rtl;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 5px;
+            font-size: 1.8em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: right;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.2);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            border-right: 4px solid #c62828;
+            font-size: 0.9em;
+        }
+
+        .info-message {
+            background: #f0f4ff;
+            color: #667eea;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 25px;
+            font-size: 0.85em;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="logo">🌙</div>
+        <h1>تسجيل الدخول</h1>
+        <p class="subtitle">نظام المحاسبة اليومية الشامل</p>
+
+        <div id="errorMessage" class="error-message">
+            اسم المستخدم أو كلمة المرور غير صحيحة!
+        </div>
+
+        <form id="loginForm" onsubmit="login(event)">
+            <div class="form-group">
+                <label for="username">🆔 اسم المستخدم:</label>
+                <input type="text" id="username" placeholder="Login ID" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="password">🔐 كلمة المرور:</label>
+                <input type="password" id="password" placeholder="******" required>
+            </div>
+
+            <button type="submit" class="login-btn">دخول للنظام</button>
+        </form>
+    </div>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="script.js"></script>
+    <script>
+        // التحقق من الجلسة الحالية
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentUser = localStorage.getItem('muhasabaCurrentUser');
+            if (currentUser) {
+                window.location.href = 'admin.html';
+            }
+        });
+
+        async function login(event) {
+            event.preventDefault();
+            const btn = event.target.querySelector('button');
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = 'جاري التحقق...';
+
+            const userVal = document.getElementById('username').value.trim();
+            const passVal = document.getElementById('password').value;
+
+            const tryLogin = (allSystemUsers) => {
+                const user = (allSystemUsers || []).find(u => u.username === userVal && u.password === passVal);
+                if (user) {
+                    localStorage.setItem('muhasabaCurrentUser', JSON.stringify(user));
+                    window.location.href = 'admin.html';
+                } else {
+                    const errorMsg = document.getElementById('errorMessage');
+                    errorMsg.style.display = 'block';
+                    setTimeout(() => errorMsg.style.display = 'none', 3000);
+                    document.getElementById('password').value = '';
+                    document.getElementById('password').focus();
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
+            };
+
+            // محاولة الجلب من Supabase مع مؤقت زمني لعدم التعليق
+            try {
+                if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
+                    const tempClient = window.supabase.createClient(
+                        'https://moaosdyamrorzqtekakj.supabase.co',
+                        'sb_publishable__novwJIZbe9n8GtnUX3g-A_0FhJi47y'
+                    );
+
+                    // عمل سباق بين الجلب والمؤقت (5 ثواني)
+                    const fetchOp = tempClient.from('settings').select('*').eq('key', 'systemUsers').single();
+                    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
+
+                    const response = await Promise.race([fetchOp, timeout]);
+                    const { data, error } = response;
+
+                    if (!error && data) {
+                        const fbUsers = data.value;
+                        const allSystemUsers = Array.isArray(fbUsers) ? fbUsers : Object.values(fbUsers);
+                        tryLogin(allSystemUsers);
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error("Supabase login delay or error, falling back:", err);
+            }
+
+            // الخيار الأخير: الدخول بدون سحاب (Local Fallback)
+            console.log("🔐 محاولة الدخول المحلي...");
+            const stored = JSON.parse(localStorage.getItem('muhasabaSystemUsers') || 'null');
+            const allSystemUsers = stored || [{ id: 'u_admin', username: 'admin', password: '123', role: 'Owner', name: 'المالك الرئيسي' }];
+            tryLogin(allSystemUsers);
+        }
+    </script>
+</body>
+
+</html>
