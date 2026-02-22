@@ -911,7 +911,96 @@ function exportDashboardToPDF() {
 
 function exportRankingToPDF() {
     if (typeof html2pdf === 'undefined') { alert('مكتبة PDF غير محملة'); return; }
-    html2pdf().set({ ...pdfOptions, filename: 'تصنيف_المحاسبة.pdf' }).from(document.getElementById('rankingPage')).save();
+
+    const s = document.getElementById('rankingStartDate')?.value;
+    const e = document.getElementById('rankingEndDate')?.value;
+    if (!s || !e) { alert('حدد الفترة أولاً'); return; }
+
+    const start = new Date(s + 'T00:00:00'), end = new Date(e + 'T23:59:59');
+    const filtered = getFilteredData().filter(x => { const d = new Date(x.timestamp); return d >= start && d <= end; });
+    const stats = {};
+    filtered.forEach(x => {
+        if (!stats[x.userName]) stats[x.userName] = { t: 0, c: 0 };
+        stats[x.userName].t += x.totalPercentage;
+        stats[x.userName].c++;
+    });
+    const r = Object.keys(stats).map(n => ({ name: n, avg: stats[n].t / stats[n].c, days: stats[n].c })).sort((a, b) => b.avg - a.avg);
+
+    let html = `
+    <div style="font-family: Arial, sans-serif; direction: rtl; text-align: right; padding: 20px; background: white; color: #333;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #667eea; padding-bottom: 20px;">
+            <h1 style="color: #667eea; margin: 0; font-size: 26px;">🏆 التصنيف العام للمستخدمين</h1>
+            <p style="color: #666; font-size: 14px; margin-top: 10px;">الفترة: من ${s} إلى ${e}</p>
+            <p style="color: #888; font-size: 12px;">تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}</p>
+        </div>`;
+
+    // المنصة (أفضل 3)
+    if (r.length >= 3) {
+        const medals = ['🥇', '🥈', '🥉'];
+        const colors = ['#FFD700', '#C0C0C0', '#CD7F32'];
+        const heights = [130, 100, 80];
+        html += `<div style="display: flex; justify-content: center; align-items: flex-end; gap: 20px; margin: 30px 0;">`;
+        [1, 0, 2].forEach(idx => {
+            if (r[idx]) {
+                html += `<div style="text-align:center; flex:1; max-width:150px;">
+                    <div style="font-size: 2em;">${medals[idx]}</div>
+                    <div style="font-weight:bold; font-size:0.95em; margin: 5px 0;">${r[idx].name}</div>
+                    <div style="height:${heights[idx]}px; background:${colors[idx]}; border-radius:10px 10px 0 0; display:flex; align-items:center; justify-content:center; color:white; font-weight:bold; font-size:1.1em;">${r[idx].avg.toFixed(1)}%</div>
+                </div>`;
+            }
+        });
+        html += `</div>`;
+    }
+
+    // جدول الترتيب
+    html += `
+        <h3 style="color: #667eea; border-right: 4px solid #667eea; padding-right: 10px; margin-top: 30px;">📊 القائمة الكاملة والترتيب</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr style="background: #667eea; color: white;">
+                    <th style="padding: 10px; border: 1px solid #ddd;">المركز</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">الاسم</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">المتوسط</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">أيام المحاسبة</th>
+                    <th style="padding: 10px; border: 1px solid #ddd;">المستوى</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    r.forEach((u, i) => {
+        const bg = i % 2 === 0 ? '#f8f9ff' : '#fff';
+        html += `<tr style="background: ${bg};">
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${i + 1}</td>
+            <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">${u.name}</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center; color: #667eea; font-weight: bold;">${u.avg.toFixed(1)}%</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${u.days}</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${getLevel(u.avg)}</td>
+        </tr>`;
+    });
+
+    html += `</tbody></table>`;
+
+    // يحتاجون تشجيع
+    const weak = r.filter(u => u.avg < 60);
+    if (weak.length > 0) {
+        html += `
+        <div style="margin-top: 30px; padding: 20px; background: #fff5f5; border-radius: 12px; border-right: 6px solid #ff4d4d;">
+            <h3 style="color: #ff4d4d; margin-top: 0;">📉 يحتاجون تشجيع ومتابعة</h3>`;
+        weak.forEach(u => {
+            html += `<div style="padding: 8px; margin: 5px 0; background: white; border-radius: 6px; border-right: 3px solid #ff4d4d;">
+                <strong>${u.name}</strong>: ${u.avg.toFixed(1)}%
+            </div>`;
+        });
+        html += `</div>`;
+    }
+
+    html += `
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #888; font-size: 12px;">
+            نظام المحاسبة اليومية - تم توليد التقرير آلياً
+        </div>
+    </div>`;
+
+    html2pdf().set({ ...pdfOptions, filename: `تصنيف_المحاسبة_${s}_${e}.pdf` }).from(html).save();
 }
 
 function exportUserReportToPDF() {
