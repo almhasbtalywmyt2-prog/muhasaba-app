@@ -170,6 +170,25 @@
         </select>
       </div>
 
+      <!-- فلاتر التاريخ للتقرير -->
+      <div class="user-selector"
+        style="display: flex; gap: 15px; align-items: flex-end; justify-content: center; flex-wrap: wrap; background: #f0f4ff; padding: 20px; border-radius: 12px; margin-top: 15px;">
+        <div style="flex: 1; min-width: 150px;">
+          <label style="display:block; margin-bottom:5px; font-weight: bold;">📅 من تاريخ:</label>
+          <input type="date" id="reportStartDate"
+            style="width: 100%; padding:8px; border:2px solid #667eea; border-radius:8px; outline: none;">
+        </div>
+        <div style="flex: 1; min-width: 150px;">
+          <label style="display:block; margin-bottom:5px; font-weight: bold;">📅 إلى تاريخ:</label>
+          <input type="date" id="reportEndDate"
+            style="width: 100%; padding:8px; border:2px solid #667eea; border-radius:8px; outline: none;">
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button onclick="loadUserReport()" class="submit-btn"
+            style="width: auto; margin: 0; padding: 0 20px; background: #667eea;">🔄 تحديث</button>
+        </div>
+      </div>
+
       <div id="userReportContent" style="display: none;">
         <!-- زر تصدير PDF -->
         <div style="text-align: center; margin: 20px 0;">
@@ -181,7 +200,7 @@
 
         <!-- التقرير اليومي -->
         <div class="chart-container">
-          <h3>📊 التقرير اليومي (آخر 7 أيام)</h3>
+          <h3 id="dailyReportTitle">📊 التقرير اليومي</h3>
           <div id="dailyReportTable"></div>
         </div>
 

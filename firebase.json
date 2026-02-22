@@ -1,0 +1,24 @@
+{
+    "hosting": {
+        "public": ".",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**",
+            "server/**",
+            "src/**",
+            "*.md",
+            "package.json",
+            "package-lock.json",
+            "vite.config.js",
+            "tailwind.config.js",
+            "postcss.config.js"
+        ],
+        "rewrites": [
+            {
+                "source": "**",
+                "destination": "/index.html"
+            }
+        ]
+    }
+}

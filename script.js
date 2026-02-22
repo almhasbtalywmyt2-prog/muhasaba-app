@@ -621,7 +621,22 @@ function loadUserReport() {
     if (!u) return;
     const content = document.getElementById('userReportContent');
     const noData = document.getElementById('noReportData');
-    const data = getFilteredData().filter(e => e.userName === u).sort((a, b) => b.timestamp - a.timestamp);
+
+    // قراءة فلاتر التاريخ
+    const startDateVal = document.getElementById('reportStartDate')?.value;
+    const endDateVal = document.getElementById('reportEndDate')?.value;
+    const startDate = startDateVal ? new Date(startDateVal + 'T00:00:00') : null;
+    const endDate = endDateVal ? new Date(endDateVal + 'T23:59:59') : null;
+
+    // فلترة البيانات حسب المستخدم والتاريخ
+    let data = getFilteredData().filter(e => e.userName === u).sort((a, b) => b.timestamp - a.timestamp);
+
+    if (startDate || endDate) {
+        data = data.filter(e => {
+            const d = new Date(e.timestamp);
+            return (!startDate || d >= startDate) && (!endDate || d <= endDate);
+        });
+    }
 
     if (data.length === 0) {
         if (content) content.style.display = 'none';
@@ -631,10 +646,23 @@ function loadUserReport() {
     if (content) content.style.display = 'block';
     if (noData) noData.style.display = 'none';
 
-    const last7 = data.slice(0, 7);
+    // تحديث عنوان التقرير
+    const titleEl = document.getElementById('dailyReportTitle');
+    if (titleEl) {
+        if (startDate && endDate) {
+            titleEl.textContent = `📊 التقرير اليومي (من ${startDateVal} إلى ${endDateVal})`;
+        } else if (startDate) {
+            titleEl.textContent = `📊 التقرير اليومي (من ${startDateVal})`;
+        } else if (endDate) {
+            titleEl.textContent = `📊 التقرير اليومي (إلى ${endDateVal})`;
+        } else {
+            titleEl.textContent = `📊 التقرير اليومي (جميع البيانات - ${data.length} يوم)`;
+        }
+    }
+
     const dailyTable = document.getElementById('dailyReportTable');
     if (dailyTable) {
-        dailyTable.innerHTML = `<table style="width:100%;"><thead><tr><th>التاريخ</th><th>النسبة</th><th>المستوى</th></tr></thead><tbody>${last7.map(e => `<tr><td>${new Date(e.date).toLocaleDateString('ar-SA')}</td><td>${e.totalPercentage.toFixed(1)}%</td><td>${e.level}</td></tr>`).join('')}</tbody></table>`;
+        dailyTable.innerHTML = `<table style="width:100%;"><thead><tr><th>التاريخ</th><th>النسبة</th><th>المستوى</th></tr></thead><tbody>${data.map(e => `<tr><td>${new Date(e.date).toLocaleDateString('ar-SA')}</td><td>${e.totalPercentage.toFixed(1)}%</td><td>${e.level}</td></tr>`).join('')}</tbody></table>`;
     }
 
     const allAvgs = {};
@@ -793,7 +821,7 @@ function changeAdminPassword() {
 const pdfOptions = {
     margin: 10,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 3, useCORS: true, letterRendering: true },
+    html2canvas: { scale: 2, useCORS: true, letterRendering: true },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
 };
 
@@ -895,12 +923,33 @@ function exportUserReportToPDF() {
 }
 
 function generateDetailedReportHTML() {
-    const userData = getFilteredData().filter(e => e.userName === currentReportUser);
-    const last7Days = [];
-    for (let i = 6; i >= 0; i--) {
-        const d = new Date(); d.setDate(d.getDate() - i);
-        const dayData = userData.find(e => new Date(e.date).toDateString() === d.toDateString());
-        last7Days.push({ date: d, data: dayData });
+    // قراءة فلاتر التاريخ
+    const startDateVal = document.getElementById('reportStartDate')?.value;
+    const endDateVal = document.getElementById('reportEndDate')?.value;
+    const startDate = startDateVal ? new Date(startDateVal + 'T00:00:00') : null;
+    const endDate = endDateVal ? new Date(endDateVal + 'T23:59:59') : null;
+
+    let userData = getFilteredData().filter(e => e.userName === currentReportUser);
+
+    // فلترة حسب التاريخ المحدد
+    if (startDate || endDate) {
+        userData = userData.filter(e => {
+            const d = new Date(e.timestamp);
+            return (!startDate || d >= startDate) && (!endDate || d <= endDate);
+        });
+    }
+
+    // ترتيب من الأحدث للأقدم
+    userData.sort((a, b) => b.timestamp - a.timestamp);
+
+    // تحديد عنوان الفترة
+    let periodTitle = 'جميع البيانات';
+    if (startDate && endDate) {
+        periodTitle = `من ${startDateVal} إلى ${endDateVal}`;
+    } else if (startDate) {
+        periodTitle = `من ${startDateVal}`;
+    } else if (endDate) {
+        periodTitle = `إلى ${endDateVal}`;
     }
 
     const activityAverages = {};
@@ -918,9 +967,10 @@ function generateDetailedReportHTML() {
             <h1 style="color: #667eea; margin: 0; font-size: 26px;">محاسبة يومية - تقرير شامل</h1>
             <h2 style="color: #764ba2; margin: 10px 0; font-size: 20px;">المستخدم: ${currentReportUser}</h2>
             <p style="color: #666; font-size: 14px;">تاريخ التقرير: ${new Date().toLocaleDateString('ar-SA')}</p>
+            <p style="color: #888; font-size: 13px;">الفترة: ${periodTitle}</p>
         </div>
 
-        <h3 style="color: #667eea; border-right: 4px solid #667eea; padding-right: 10px; margin-top: 20px;">1. التقرير اليومي (آخر 7 أيام)</h3>
+        <h3 style="color: #667eea; border-right: 4px solid #667eea; padding-right: 10px; margin-top: 20px;">1. التقرير اليومي (${periodTitle})</h3>
         <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
             <thead>
                 <tr style="background: #667eea; color: white;">
@@ -932,12 +982,13 @@ function generateDetailedReportHTML() {
             </thead>
             <tbody>`;
 
-    last7Days.forEach(day => {
+    userData.forEach(entry => {
+        const entryDate = new Date(entry.date);
         html += `<tr>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${day.date.toLocaleDateString('ar-SA', { weekday: 'long' })}</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${day.date.toLocaleDateString('ar-SA', { day: 'numeric', month: 'numeric' })}</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${day.data ? day.data.totalPercentage.toFixed(1) + '%' : '-'}</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${day.data ? day.data.level : '-'}</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${entryDate.toLocaleDateString('ar-SA', { weekday: 'long' })}</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${entryDate.toLocaleDateString('ar-SA', { day: 'numeric', month: 'numeric' })}</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${entry.totalPercentage.toFixed(1)}%</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">${entry.level}</td>
         </tr>`;
     });
 
