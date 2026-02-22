@@ -1,13 +1,13 @@
-# 🔗 روابط الدخول للنظام (التحديث الأخير)
+# 🔗 روابط الدخول للنظام (الرابط الدائم الجديد - GitHub)
 
 ## 📍 الرابط الأساسي (إدخال البيانات للمستخدمين)
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html
 ```
 
 ## 🔐 رابط لوحة التحكم (للمسؤول)
 ```
-https://clever-babka-fbd3dd.netlify.app/login.html
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/login.html
 ```
 
 ---
@@ -16,77 +16,77 @@ https://clever-babka-fbd3dd.netlify.app/login.html
 
 ### 1️⃣ بلال طاهر
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=بلال%20طاهر
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=بلال%20طاهر
 ```
 
 ### 2️⃣ صالح العواوي
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=صالح%20العواوي
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=صالح%20العواوي
 ```
 
 ### 3️⃣ صخر حنكل
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=صخر%20حنكل
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=صخر%20حنكل
 ```
 
 ### 4️⃣ محمد نبيل
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=محمد%20نبيل
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=محمد%20نبيل
 ```
 
 ### 5️⃣ سيف القاضي
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=سيف%20القاضي
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=سيف%20القاضي
 ```
 
 ### 5️⃣ صهيب طاهر
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=صهيب%20طاهر
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=صهيب%20طاهر
 ```
 
 ### 6️⃣ عبدالعزيز العواوي
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=عبدالعزيز%20العواوي
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=عبدالعزيز%20العواوي
 ```
 
 ### 7️⃣ مجاهد جعوان
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=مجاهد%20جعوان
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=مجاهد%20جعوان
 ```
 
 ### 8️⃣ عبدالرحمن بطاح
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=عبدالرحمن%20بطاح
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=عبدالرحمن%20بطاح
 ```
 
 ### 9️⃣ عبدالرحمن الحللي
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=عبدالرحمن%20الحللي
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=عبدالرحمن%20الحللي
 ```
 
 ### 🔟 يوسف عايض
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=يوسف%20عايض
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=يوسف%20عايض
 ```
 
 ### 1️⃣1️⃣ هلال العوي
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=هلال%20العوي
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=هلال%20العوي
 ```
 
 ### 1️⃣2️⃣ عبدالحميد نوفل
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=عبدالحميد%20نوفل
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=عبدالحميد%20نوفل
 ```
 
 ### 1️⃣3️⃣ شاكر مساعد
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=شاكر%20مساعد
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=شاكر%20مساعد
 ```
 
 ### 1️⃣4️⃣ محمد الحدي
 ```
-https://clever-babka-fbd3dd.netlify.app/index.html?user=محمد%20الحدي
+https://almhasbtalywmyt2-prog.github.io/muhasaba-app/index.html?user=محمد%20الحدي
 ```
 
 ---

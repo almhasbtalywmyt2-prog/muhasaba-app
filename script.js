@@ -799,7 +799,86 @@ const pdfOptions = {
 
 function exportDashboardToPDF() {
     if (typeof html2pdf === 'undefined') { alert('مكتبة PDF غير محملة'); return; }
-    html2pdf().set({ ...pdfOptions, filename: 'تقرير_المحاسبة.pdf' }).from(document.getElementById('leaderboardTable')).save();
+
+    const f = document.getElementById('dashboardDateFilter');
+    const selectedDate = f && f.value ? f.value : new Date().toLocaleDateString('en-CA');
+    const displayDate = new Date(selectedDate).toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    // البيانات
+    const done = window.currentDashboardDoneUsers || [];
+    const notDone = window.currentDashboardNotDoneUsers || [];
+    const avg = document.getElementById('avgScore')?.textContent || '0%';
+
+    let html = `
+    <div style="font-family: Arial, sans-serif; direction: rtl; text-align: right; padding: 25px; background: white; color: #333;">
+        <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #4a90e2; padding-bottom: 20px;">
+            <h1 style="color: #4a90e2; margin: 0; font-size: 28px;">تقرير المحاسبة اليومية العام</h1>
+            <p style="color: #666; font-size: 16px; margin-top: 10px;">التاريخ المستهدف: ${displayDate}</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 30px;">
+            <div style="background: #f0f7ff; padding: 15px; border-radius: 10px; border: 1px solid #4a90e2; text-align: center;">
+                <div style="color: #4a90e2; font-size: 14px;">تمت المحاسبة</div>
+                <div style="font-size: 24px; font-weight: bold;">${done.length}</div>
+            </div>
+            <div style="background: #fff5f5; padding: 15px; border-radius: 10px; border: 1px solid #ff4d4d; text-align: center;">
+                <div style="color: #ff4d4d; font-size: 14px;">لم تتم المحاسبة</div>
+                <div style="font-size: 24px; font-weight: bold;">${notDone.length}</div>
+            </div>
+            <div style="background: #f6f0ff; padding: 15px; border-radius: 10px; border: 1px solid #764ba2; text-align: center;">
+                <div style="color: #764ba2; font-size: 14px;">متوسط الأداء</div>
+                <div style="font-size: 24px; font-weight: bold;">${avg}</div>
+            </div>
+        </div>
+
+        <h3 style="color: #4a90e2; border-right: 4px solid #4a90e2; padding-right: 10px;">📊 جدول الترتيب والنتائج</h3>
+        <table style="width: 100%; border-collapse: collapse; margin-top: 15px; margin-bottom: 30px;">
+            <thead>
+                <tr style="background: #4a90e2; color: white;">
+                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">#</th>
+                    <th style="padding: 12px; border: 1px solid #ddd; text-align: right;">الاسم</th>
+                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">النسبة</th>
+                    <th style="padding: 12px; border: 1px solid #ddd; text-align: center;">المستوى</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    if (done.length > 0) {
+        done.sort((a, b) => b.totalPercentage - a.totalPercentage).forEach((e, i) => {
+            html += `<tr>
+                <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${i + 1}</td>
+                <td style="padding: 10px; border: 1px solid #ddd; font-weight: bold;">${e.userName}</td>
+                <td style="padding: 10px; border: 1px solid #ddd; text-align: center; color: #4a90e2; font-weight: bold;">${e.totalPercentage.toFixed(1)}%</td>
+                <td style="padding: 10px; border: 1px solid #ddd; text-align: center;">${e.level}</td>
+            </tr>`;
+        });
+    } else {
+        html += `<tr><td colspan="4" style="padding: 20px; text-align: center; color: #888;">لا توجد بيانات لهذا اليوم</td></tr>`;
+    }
+
+    html += `</tbody></table>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div>
+                <h3 style="color: #2e7d32; border-right: 4px solid #2e7d32; padding-right: 10px;">✅ الذين أنجزوا المحاسبة</h3>
+                <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                    ${done.length > 0 ? done.map(u => `<li style="padding: 5px; border-bottom: 1px solid #f0f0f0;">• ${u.userName}</li>`).join('') : '<li style="color:#999;">لا يوجد أحد</li>'}
+                </ul>
+            </div>
+            <div>
+                <h3 style="color: #d32f2f; border-right: 4px solid #d32f2f; padding-right: 10px;">⏳ المتبقون (لم يحاسبوا)</h3>
+                <ul style="list-style: none; padding: 0; margin-top: 10px;">
+                    ${notDone.length > 0 ? notDone.map(u => `<li style="padding: 5px; border-bottom: 1px solid #f0f0f0;">• ${u}</li>`).join('') : '<li style="color:#999;">الجميع أنجز المحاسبة ✅</li>'}
+                </ul>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; color: #999; font-size: 11px;">
+            تم توليد هذا التقرير من نظام المحاسبة اليومية | الذاكرون والذاكرات
+        </div>
+    </div>`;
+
+    html2pdf().set({ ...pdfOptions, filename: `تقرير_لوحة_التحكم_${selectedDate}.pdf` }).from(html).save();
 }
 
 function exportRankingToPDF() {
