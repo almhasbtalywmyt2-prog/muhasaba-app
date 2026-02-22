@@ -152,6 +152,7 @@
         window.addEventListener('DOMContentLoaded', () => {
             const currentUser = localStorage.getItem('muhasabaCurrentUser');
             if (currentUser) {
+                // استخدام مسار نسبي لضمان العمل في مجلدات GitHub Pages
                 window.location.href = 'admin.html';
             }
         });
@@ -170,6 +171,7 @@
                 const user = (allSystemUsers || []).find(u => u.username === userVal && u.password === passVal);
                 if (user) {
                     localStorage.setItem('muhasabaCurrentUser', JSON.stringify(user));
+                    // استخدام مسار نسبي
                     window.location.href = 'admin.html';
                 } else {
                     const errorMsg = document.getElementById('errorMessage');
@@ -182,7 +184,7 @@
                 }
             };
 
-            // محاولة الجلب من Supabase مع مؤقت زمني لعدم التعليق
+            // محاولة الجلب من Supabase مع مؤقت زمني سريع (2 ثانية فقط) لضمان عدم تعليق المستخدم
             try {
                 if (typeof window.supabase !== 'undefined' && typeof window.supabase.createClient === 'function') {
                     const tempClient = window.supabase.createClient(
@@ -190,9 +192,9 @@
                         'sb_publishable__novwJIZbe9n8GtnUX3g-A_0FhJi47y'
                     );
 
-                    // عمل سباق بين الجلب والمؤقت (5 ثواني)
+                    // سباق لمدة 2 ثانية فقط (أسرع من السابق)
                     const fetchOp = tempClient.from('settings').select('*').eq('key', 'systemUsers').single();
-                    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
+                    const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000));
 
                     const response = await Promise.race([fetchOp, timeout]);
                     const { data, error } = response;

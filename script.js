@@ -80,9 +80,9 @@ async function initFirebaseListeners() {
     try {
         console.log('🔄 جاري محاولة مزامنة البيانات من Supabase...');
 
-        // جلب الإعدادات (المستخدمين، الأنشطة، الدورات) بمؤقت زمني (تجنباً للتعليق)
+        // جلب الإعدادات (المستخدمين، الأنشطة، الدورات) بمؤقت زمني سريع (2 ثانية فقط)
         const fetchSettings = supabaseClient.from('settings').select('*');
-        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000));
+        const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000));
 
         const { data: settings, error } = await Promise.race([fetchSettings, timeout]);
 
@@ -1009,7 +1009,9 @@ function updateUserForm() {
     const linkDisplay = document.getElementById('linkDisplay');
     if (u && link && linkDisplay) {
         link.style.display = 'block';
-        linkDisplay.value = `${window.location.origin}/?user=${encodeURIComponent(u)}`;
+        // إصلاح الرابط ليناسب GitHub Pages أو أي استضافة أخرى
+        const baseUrl = window.location.href.split('?')[0].split('#')[0];
+        linkDisplay.value = `${baseUrl}?user=${encodeURIComponent(u)}`;
     } else if (link) {
         link.style.display = 'none';
     }
